@@ -16,7 +16,7 @@ function start() {
   mesOutils = monCanvas.getContext("2d");
   monCanvas.style.backgroundColor = "black"
 
-  radius = window.innerHeight - 200;
+  radius = window.innerHeight - 250;
 
   animate();
 
@@ -32,7 +32,7 @@ function dessine() {
   let x = monCanvas.width / 2;
   let y = monCanvas.height / 2;
 
-  let posX = x + Math.cos(angle * (Math.PI / 85)) * radius;
+  let posX = x + Math.cos(angle * (Math.PI / 87)) * radius;
   let posY = y + Math.sin(angle * (Math.PI / 90)) * radius;
 
   // outer ellipse
