@@ -9,7 +9,7 @@ let sizeV = Math.random() * 100 + 10;
 
 function start() {
   monCanvas = document.getElementById("canvas");
-  monCanvas.width = (window.innerWidth - 60 * pixelRatio) * pixelRatio;
+  monCanvas.width = (window.innerWidth - 60  * pixelRatio) * pixelRatio;
   monCanvas.height = (window.innerHeight - 60 * pixelRatio) * pixelRatio;
   monCanvas.style.width = window.innerWidth - 60 * pixelRatio;
   monCanvas.style.height = window.innerHeight - 60 * pixelRatio;
@@ -32,7 +32,7 @@ function dessine() {
   let x = monCanvas.width / 2;
   let y = monCanvas.height / 2;
 
-  let posX = x + Math.cos(angle * (Math.PI / 87)) * radius;
+  let posX = x + Math.cos(angle * (Math.PI / 85)) * radius;
   let posY = y + Math.sin(angle * (Math.PI / 90)) * radius;
 
   // outer ellipse
