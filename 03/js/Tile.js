@@ -31,7 +31,7 @@ class Tile {
 
     
     this.ctx.strokeStyle = "white";
-    this.ctx.lineWidth = 20;
+    this.ctx.lineWidth = 15;
     this.ctx.beginPath();
     this.ctx.arc(
       (0 - this.size / 2) / this.size,
@@ -62,7 +62,8 @@ class Tile {
     //this.ctx.stroke();
     this.ctx.closePath();
     
-
+    
+    this.ctx.fillStyle = "white";
     this.ctx.beginPath();
     this.ctx.arc(
       this.size / 2,
@@ -72,8 +73,8 @@ class Tile {
       -Math.PI / 2,
       false
     );
-    //this.ctx.fill();
-    this.ctx.stroke();
+    this.ctx.fill();
+    //this.ctx.stroke();
     this.ctx.closePath();
 
     this.ctx.fillStyle = "white"
