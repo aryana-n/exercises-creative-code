@@ -36,7 +36,7 @@ function start() {
 
   // on ajoute un écouteur d'événement "click"
   //  sur le document
-  document.addEventListener("mousemove", function (event) {
+  document.addEventListener("click", function (event) {
     // on vérifie si l'utilisateur a cliqué sur un tile
     tiles.forEach((tile) => {
       if (
