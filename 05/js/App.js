@@ -1,10 +1,3 @@
-/**
- *  EASING REF:
- *  https://easings.net/#
- */
-
-let cpt = 0;
-
 class App {
   constructor() {
     this.pixelRatio = window.devicePixelRatio || 1;
@@ -15,138 +8,114 @@ class App {
     this.canvas.style.height = window.innerHeight;
     document.body.appendChild(this.canvas);
     this.ctx = this.canvas.getContext("2d");
+    this.img_file = "./asset/andy.jpg";
     this.setup();
   }
 
+  initWebcam() {
+    this.video = document.createElement("video");
+
+    navigator.getMedia =
+      navigator.getUserMedia ||
+      navigator.webkitGetUserMedia ||
+      navigator.mozGetUserMedia ||
+      navigator.msGetUserMedia;
+
+    navigator.getMedia(
+      {
+        video: { width: 640, height: 480 },
+        audio: false,
+      },
+      (stream) => {
+        this.video.srcObject = stream;
+        this.video.play();
+      },
+      (err) => {
+        console.log("An error occured! " + err);
+      }
+    );
+  }
+
   setup() {
-    this.mouse = { x: 0, y: 0 };
-    let radius = 200;
-    this.angle = 0;
-    const center = {
-      x: (window.innerWidth / 2) * this.pixelRatio,
-      y: (window.innerHeight / 2) * this.pixelRatio,
-    };
+    this.initWebcam();
+    this.grid = [];
+    this.scale = 4;
+    this.stepX = Math.floor(640 / 70);
+    this.stepY = Math.floor(480 / 70);
 
-    //WINGs
-    this.wing = new Wing(
-      this.canvas.width / 2,
-      this.canvas.height / 2 + 250,
-      200,
-      this.ctx,
-      cpt
-    );
+    this.offsetX =
+      (window.innerWidth / 2) * this.pixelRatio -
+      (this.stepX * 70 * this.scale) / 2
+    ;
+    this.offsetY =
+      (window.innerHeight / 2) * this.pixelRatio -
+      (this.stepY * 70 * this.scale) / 2
+    ;
 
-    //ANTENNA
-    this.antenna = new Antenna(
-      this.canvas.width / 2,
-      this.canvas.height / 2 - 180,
-      20,
-      this.ctx,
-      cpt
-    );
+    for (let j = 0; j < 480; j += this.stepY) {
+      for (let i = 0; i < 640; i += this.stepX) {
+        this.grid.push(
+          new Circle(
+            this.offsetX + i * this.scale,
+            this.offsetY + j * this.scale,
+            15,
+            this.ctx
+          )
+        );
+      }
+    }
 
-    //STINGER
-    this.stinger = new Stinger(
-      this.canvas.width / 2 + 30 ,
-      this.canvas.height / 2 - 270,
-      this.ctx,
-      cpt
-    );
+    document.addEventListener("mousemove", (event) => {
+			this.mouse = {
+				x: event.clientX * this.pixelRatio,
+				y: event.clientY * this.pixelRatio,
+			};
 
-    //EYES
-    this.eyes = new Array(
-      new Eye(center.x - 100, center.y - 100, 50, this.ctx),
-      new Eye(center.x + 100, center.y - 100, 50, this.ctx)
-    );
-
-    document.addEventListener("click", this.click.bind(this));
-    document.addEventListener("mousemove", this.move.bind(this));
-
+			for (let i = 0; i < this.grid.length; i++) {
+				this.grid[i].move(this.mouse);
+			}
+		});
+    
     this.draw();
   }
 
-  click(e) {
+  detectPixels() {
+    if (this.video) {
+      this.ctx.drawImage(this.video, 0, 0, 640, 480);
+    }
 
-    this.wing.resetAndGo(
-      this.canvas.width / 2,
-      this.canvas.height / 2+100
-      // e.clientX * this.pixelRatio,
-      // e.clientY * this.pixelRatio
-    );
+    this.imgData = this.ctx.getImageData(0, 0, 640, 480);
 
-    this.antenna.resetAndGo(
-      this.canvas.width / 2,
-      this.canvas.height / 2 - 250
-    );
-    this.stinger.resetAndGo(
-      this.canvas.width / 2 - 30,
-      this.canvas.height / 2 - 270
-    );
+    this.pixels = this.imgData.data;
+
+    this.rgb = [];
+    for (let j = 0; j < 480; j += this.stepY) {
+      for (let i = 0; i < 640; i += this.stepX) {
+        let index = (j * 640 + i) * 4;
+        this.rgb.push({
+          r: this.pixels[index],
+          g: this.pixels[index + 1],
+          b: this.pixels[index + 2],
+          a: this.pixels[index + 3],
+        });
+      }
+    }
+
   }
 
   draw() {
-    this.ctx.fillStyle = "lightblue";
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    // this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.detectPixels();
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.ctx.lineWidth = 3;
-
-    this.wing.draw();
-    this.stinger.draw();
-    this.antenna.draw();
-
-    // body
-    this.ctx.save();
-    this.ctx.fillStyle = "#FFDA0E";
-    this.ctx.strokeStyle = "black";
-    this.ctx.lineWidth = 4;
-    this.ctx.scale(0.75, 1);
-    this.ctx.beginPath();
-    this.ctx.arc(
-      this.canvas.width / 2 / 0.75,
-      this.canvas.height / 2 + 250,
-      300,
-      0,
-      Math.PI * 2
-    );
-    this.ctx.fill();
-    this.ctx.stroke();
-    this.ctx.closePath();
-    this.ctx.restore();
-
-    // head
-    this.ctx.save();
-    this.ctx.fillStyle = "#F9DD48";
-    this.ctx.strokeStyle = "black";
-    this.ctx.beginPath();
-    this.ctx.arc(
-      this.canvas.width / 2,
-      this.canvas.height / 2 - 100,
-      200,
-      0,
-      Math.PI * 2
-    );
-    this.ctx.fill();
-    this.ctx.stroke();
-    this.ctx.closePath();
-    this.ctx.restore();
-
-    this.eyes.forEach((eye) => {
-      eye.draw(this.mouse.x, this.mouse.y);
+    this.grid.forEach((circle, index) => {
+      const color = this.rgb[index];
+      circle.color = `rgba(${color.r}, ${color.g}, ${color.b})`;
+      circle.draw();
     });
+
     requestAnimationFrame(this.draw.bind(this));
   }
 
-  move(e) {
-    this.mouse = {
-      x: e.clientX * this.pixelRatio,
-      y: e.clientY * this.pixelRatio,
-    };
-  }
-
-  dist(x1, y1, x2, y2) {
-    return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-  }
 }
 
 window.onload = function () {
