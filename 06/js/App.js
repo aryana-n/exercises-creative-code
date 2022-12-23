@@ -29,7 +29,7 @@ class App {
     //   }
     // }
 
-    this.points = [];
+    this.grid = [];
     this.totalLines = 100;
     this.subdivisions = 100;
     this.space = window.innerWidth / 1.2 / this.subdivisions;
@@ -39,13 +39,12 @@ class App {
       y: this.canvas.height / 2 - (this.totalLines * this.space) / 2,
     };
   
-    // build grid
     for (let j = 0; j < this.totalLines; j++) {
       for (let i = 0; i < this.subdivisions; i++) {
         const x = i * this.space + this.topLeft.x;
         let y = j * this.space + this.topLeft.y;
         const circle = new Circle(x, y, 4, this.ctx);
-        this.points.push(circle);
+        this.grid.push(circle);
       }
     }
 
@@ -90,7 +89,7 @@ class App {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     //draw all circle of the grid
-    this.points.forEach((circle, index) => {
+    this.grid.forEach((circle, index) => {
       const color = this.rgb[index];
       circle.color = `rgb(${color.r}, ${color.g}, ${color.b})`;
       circle.draw();
@@ -101,15 +100,15 @@ class App {
       for (let j = 0; j < this.subdivisions - 1; j++) {
         const index = i * this.subdivisions + j;
         if (j == 0) {
-          this.ctx.moveTo(this.points[index].x, this.points[index].y);
+          this.ctx.moveTo(this.grid[index].x, this.grid[index].y);
         }
         // replace that line with a quadratic curve
         // this.ctx.lineTo(this.points[index + 1].x, this.points[index + 1].y);
-        const cx = (this.points[index].x + this.points[index + 1].x) / 2;
-        const cy = (this.points[index].y + this.points[index + 1].y) / 2;
+        const cx = (this.grid[index].x + this.grid[index + 1].x) / 2;
+        const cy = (this.grid[index].y + this.grid[index + 1].y) / 2;
         this.ctx.quadraticCurveTo(
-          this.points[index].x,
-          this.points[index].y,
+          this.grid[index].x,
+          this.grid[index].y,
           cx,
           cy
         );
